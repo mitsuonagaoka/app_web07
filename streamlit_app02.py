@@ -1041,9 +1041,6 @@ def show_invoice43():
         ylist = (40, 60, 80, 100, 120)
         cv.grid(xlist, ylist)
 
-        # # PDFファイルを保存
-        # cv.save()
-
         # PDFファイルを保存する
         cv.save()
 
