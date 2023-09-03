@@ -1048,7 +1048,7 @@ def show_invoice43():
         st.write(f"PDF file saved at: {pdf_path}")
 
 def invoice_show44():
-    # PDFファイルのディレクトリパス
+    # PDFファイルのディレクトリパス "C:\Users\Invoice"
     pdf_directory = r"C:\Users\marom\Invoice"
 
     # PDFファイルの一覧を取得する
