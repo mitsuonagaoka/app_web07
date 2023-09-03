@@ -1,8 +1,45 @@
-streamlit==1.26.0
-pandas==2.2.0
-DateTime==5.2
-image==1.5.33
+# Database
+sqlite3
 
-reportlab==4.0.4
-plotly==5.16.1
-qrcode==7.4.2
+# Data Manipulation
+pandas
+
+# Web App Framework
+streamlit
+
+# Image Processing
+Pillow
+
+# Date and Time
+datetime
+dateutil
+
+# PDF Generation
+reportlab
+reportlab[images]
+reportlab[pdfbase]
+reportlab[pdfbase.cidfonts]
+
+# Context Management
+contextlib
+
+# Data Visualization
+plotly
+
+# Data Encoding and Decoding
+base64
+
+# QR Code Generation
+qrcode
+
+# PDF to Image Conversion
+pdf2image
+
+# TrueType Fonts for PDF Generation
+reportlab[pdfbase.ttfonts]
+
+# Optical Character Recognition (OCR)
+pytesseract
+
+# Operating System Interaction
+os

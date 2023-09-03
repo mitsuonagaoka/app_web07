@@ -6,7 +6,6 @@ import streamlit as st
 from PIL import Image
 import datetime
 from datetime import date
-
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import portrait, A4
 from reportlab.lib.utils import ImageReader
@@ -16,12 +15,9 @@ from contextlib import closing
 import plotly.express as px
 import base64
 import qrcode
-
 from pdf2image import convert_from_path
-
 from reportlab.pdfbase.ttfonts import TTFont
 import pytesseract
-
 import os
 
 # フォントの登録
