@@ -853,7 +853,6 @@ def show_invoice43():
             border=8
         )
 
-        # q_data = 'https://engineer-lifestyle-blog.com/'
         q_data = 'df'
 
         qr.add_data(q_data)
@@ -865,9 +864,8 @@ def show_invoice43():
 
         ###### Invoice_issue を発行######################################################################
         # 縦型A4のCanvasを準備
-        # PDFファイルの保存先ディレクトリ "C:\Users\marom\Invoice"
-        # pdf_directory = r"C:\Users\Invoice"
-        pdf_directory = r"C:\Users\marom\Invoice"
+        # PDFファイルの保存先ディレクトリ "C:\Users\marom\Invoice" "C:\Users\marom\Invoice"
+        pdf_directory = r"C:\Users\Invoice"
 
         # 日付をYYYYMMDD形式に変換し、ファイル名に使用する
         today = date.today()
@@ -1044,8 +1042,8 @@ def show_invoice43():
         st.write(f"PDF file saved at: {pdf_path}")
 
 def invoice_show44():
-    # PDFファイルのディレクトリパス "C:\Users\Invoice"
-    pdf_directory = r"C:\Users\marom\Invoice"
+    # PDFファイルのディレクトリパス "C:\Users\Invoice" "C:\Users\Invoice"
+    pdf_directory = r"C:\Users\Invoice"
 
     # PDFファイルの一覧を取得する
     pdf_files = os.listdir(pdf_directory)
