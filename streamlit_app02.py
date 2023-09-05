@@ -41,12 +41,10 @@ choice = st.sidebar.selectbox("Menu", menu)
 def findings10():
     st.title('受注1検索0')
     st.subheader('受注1検索0は品番で表示します。')
-    # image = Image.open('./data/猫.png')
-    # st.image(image, width=70)
+    image = Image.open('./data/猫.png')
+    st.image(image, width=70)
 
     # t_受注Dataテーブルからデータを読み込む
-    # db_name = './data/product30.db'
-
     db_name = './data/product30.db'
     conn = sqlite3.connect(db_name)
     c.execute("SELECT * FROM t_受注Data")
@@ -230,557 +228,557 @@ def findings20():
     # 出荷2検索0
     st.title('出荷2検索0')
     st.subheader('出荷2検索0は品番で表示します。')
-
-    image = Image.open('./data/牛.png')
-    st.image(image, width=70)
-
-    # SQLite DBを読み込む
-    conn = sqlite3.connect(db_name)
-    c = conn.cursor()
-
-    # 品番を入力する
-    search_term = st.text_input('品番を入力してください')
-
-    # 品番でフィルタリングする
-    if search_term:
-        query = f"SELECT * FROM t_出荷Data WHERE 品番 LIKE '%{search_term}%'"
-    else:
-        query = "SELECT * FROM t_出荷Data"
-    df = pd.read_sql(query, conn)
-    conn.close()
-
-    # データフレームを表示
-    st.write(df)
-
-
+#
+#     image = Image.open('./data/牛.png')
+#     st.image(image, width=70)
+#
+#     # SQLite DBを読み込む
+#     conn = sqlite3.connect(db_name)
+#     c = conn.cursor()
+#
+#     # 品番を入力する
+#     search_term = st.text_input('品番を入力してください')
+#
+#     # 品番でフィルタリングする
+#     if search_term:
+#         query = f"SELECT * FROM t_出荷Data WHERE 品番 LIKE '%{search_term}%'"
+#     else:
+#         query = "SELECT * FROM t_出荷Data"
+#     df = pd.read_sql(query, conn)
+#     conn.close()
+#
+#     # データフレームを表示
+#     st.write(df)
+#
+#
 # ////////// 出荷検索[出荷2追加1] //////////
 def addings21():
     # title表示
     st.title('出荷2追加1')
     st.subheader('出荷2追加1は品番で追加します。')
-
-    image = Image.open('./data/牛.png')
-    st.image(image, width=70)
-
-    # SQLite3 DBに接続する
-    conn = sqlite3.connect(db_name)
-    cur = conn.cursor()
-
-    # 品番を入力する
-    search_term = st.text_input('品番を入力してください')
-    dd_品番 = search_term
-
-    tanka3_sql = conn.execute('select * from t_在庫Data where 品番=?', [dd_品番, ]).fetchall()
-    if not tanka3_sql:
-        st.write('品番が見つかりません')
-    else:
-        dd_単価 = tanka3_sql[0][5]
-        conn.commit()
-        st.write(f'単価：{dd_単価}')
-
-    # 品番でフィルタリングする
-    if search_term:
-        query = f"SELECT * FROM t_出荷Data WHERE 品番 LIKE '%{search_term}%'"
-        df = pd.read_sql_query(query, conn)
-    else:
-        query = "SELECT * FROM t_出荷Data"
-        df = pd.read_sql_query(query, conn)
-
-    # 最後の番号を取得する
-    cur.execute("SELECT MAX(番号) FROM t_出荷Data")
-    last_row = cur.fetchone()[0]
-    last_row = last_row if last_row is not None else 0
-
-    # 追加フォームを作成する
-    new_data = {}
-
-    col1, col2, col3 = st.columns(3)
-
-    # 変数の取得[dd_出荷数][dd_出荷金額]
-    dd_出荷数 = col1.text_input('出荷数')
-    dd_出荷金額 = dd_単価 * float(dd_出荷数) if dd_出荷数 else 0.0
-
-    today = datetime.date.today().strftime("%Y/%m/%d")
-    today = datetime.date.today().strftime("%Y/%m/%d")
-
-    # データを追加入力する
-    new_data['番号'] = col1.text_input('番号', value=last_row + 1)
-    new_data['品番'] = col1.text_input('品番', value=search_term)
-    new_data['出荷数'] = dd_出荷数
-    new_data['注番'] = col1.text_input('注番')
-    new_data['出荷日'] = col1.text_input('出荷日', value=today)
-    new_data['出荷金額'] = col2.text_input('出荷金額', value=str(dd_出荷金額))
-
-    # 追加ボタンを押したら、DBに書き込む
-    if st.button('追加'):
-        values = [new_data['番号'], new_data['品番'], new_data['出荷数'], new_data['注番'],
-                  new_data['出荷日'], new_data['出荷金額']]
-        cur.execute("INSERT INTO t_出荷Data VALUES (?, ?, ?, ?, ?, ?)", values)
-        conn.commit()
-
-        # 受注Dataから注番をキーに検索する
-        Tyuban01 = new_data['注番']
-        conn = sqlite3.connect(db_name)
-        Tyuban01_sql = conn.execute('select * from t_受注Data where 注番=?',
-                                    [Tyuban01, ]).fetchall()
-        conn.commit()
-
-        # sd1_受注数,sd1_納入計,sd1_注残を検索する
-        sd1_受注数 = Tyuban01_sql[0][3]
-        sd1_納入計 = Tyuban01_sql[0][4]
-        sd1_注残 = Tyuban01_sql[0][7]
-
-        # New_納入計を生産する
-        New_納入計 = int(sd1_納入計) + int(new_data['出荷数'])
-        st.success(f'データがが追加されました。')
-
-        # new_data['品番'], new_data['注番']をキーに納入数を書き換える
-        update01_sql = 'update t_受注Data set 納入数 = ? where 品番 = ? AND 注番 =?'
-        conn.execute(update01_sql, [New_納入計, new_data['品番'], new_data['注番']])
-        conn.commit()
-
-        # new_data['品番'], new_data['注番']をキーに納入日を書き換える
-        update01_sq2 = 'update t_受注Data set 納入日 = ? where 品番 = ? AND 注番 =?'
-        conn.execute(update01_sq2, [new_data['出荷日'], new_data['品番'], new_data['注番']])
-        conn.commit()
-
-        # New_注残を算出する
-        New_注残0 = int(sd1_受注数) - int(New_納入計)
-
-        # New_注残が[完納]か[注残]のメッセージのコメントを記入する
-        if sd1_受注数 == New_納入計:
-            New_注残 = f'{New_注残0} [[完納]]'
-        else:
-            New_注残 = f'{New_注残0} [注残]'
-
-        # 出荷入力時に、在庫Dataの在庫数から、出荷数を差し引く。
-        Hindan01 = dd_品番
-        conn = sqlite3.connect(db_name)
-        Tyuban01_sql_sql = conn.execute('select * from t_在庫Data where 品番=?',
-                                        [Hindan01, ]).fetchall()
-        conn.commit()
-
-        # sd1_受注数,sd1_納入計,sd1_注残を検索する
-        dd_在庫数 = Tyuban01_sql_sql[0][3]
-        New在庫数 = int(dd_在庫数) - int(dd_出荷数)
-        st.success(New在庫数)
-        st.success(new_data['品番'])
-
-        # New在庫数のsqlを実施する[t_在庫Data]
-        update01_sq1 = 'update t_在庫Data set 在庫数 = ? where 品番 = ?'
-        conn.execute(update01_sq1, [f'{New在庫数}', new_data['品番'], ])
-        conn.commit()
-
-        # New_注残の_sqlを実施する[t_受注Data]
-        update02_sq2 = 'update t_受注Data set 注残 = ? where 品番 = ? AND 注番 =?'
-        conn.execute(update02_sq2, [f'{New_注残}', new_data['品番'], new_data['注番']])
-        conn.commit()
-
-    # データを表示する
-    st.write(df)
-    st.success(new_data['注番'])
-
-    # DBをクローズする
-    cur.close()
-    conn.close()
-
-
+#
+#     image = Image.open('./data/牛.png')
+#     st.image(image, width=70)
+#
+#     # SQLite3 DBに接続する
+#     conn = sqlite3.connect(db_name)
+#     cur = conn.cursor()
+#
+#     # 品番を入力する
+#     search_term = st.text_input('品番を入力してください')
+#     dd_品番 = search_term
+#
+#     tanka3_sql = conn.execute('select * from t_在庫Data where 品番=?', [dd_品番, ]).fetchall()
+#     if not tanka3_sql:
+#         st.write('品番が見つかりません')
+#     else:
+#         dd_単価 = tanka3_sql[0][5]
+#         conn.commit()
+#         st.write(f'単価：{dd_単価}')
+#
+#     # 品番でフィルタリングする
+#     if search_term:
+#         query = f"SELECT * FROM t_出荷Data WHERE 品番 LIKE '%{search_term}%'"
+#         df = pd.read_sql_query(query, conn)
+#     else:
+#         query = "SELECT * FROM t_出荷Data"
+#         df = pd.read_sql_query(query, conn)
+#
+#     # 最後の番号を取得する
+#     cur.execute("SELECT MAX(番号) FROM t_出荷Data")
+#     last_row = cur.fetchone()[0]
+#     last_row = last_row if last_row is not None else 0
+#
+#     # 追加フォームを作成する
+#     new_data = {}
+#
+#     col1, col2, col3 = st.columns(3)
+#
+#     # 変数の取得[dd_出荷数][dd_出荷金額]
+#     dd_出荷数 = col1.text_input('出荷数')
+#     dd_出荷金額 = dd_単価 * float(dd_出荷数) if dd_出荷数 else 0.0
+#
+#     today = datetime.date.today().strftime("%Y/%m/%d")
+#     today = datetime.date.today().strftime("%Y/%m/%d")
+#
+#     # データを追加入力する
+#     new_data['番号'] = col1.text_input('番号', value=last_row + 1)
+#     new_data['品番'] = col1.text_input('品番', value=search_term)
+#     new_data['出荷数'] = dd_出荷数
+#     new_data['注番'] = col1.text_input('注番')
+#     new_data['出荷日'] = col1.text_input('出荷日', value=today)
+#     new_data['出荷金額'] = col2.text_input('出荷金額', value=str(dd_出荷金額))
+#
+#     # 追加ボタンを押したら、DBに書き込む
+#     if st.button('追加'):
+#         values = [new_data['番号'], new_data['品番'], new_data['出荷数'], new_data['注番'],
+#                   new_data['出荷日'], new_data['出荷金額']]
+#         cur.execute("INSERT INTO t_出荷Data VALUES (?, ?, ?, ?, ?, ?)", values)
+#         conn.commit()
+#
+#         # 受注Dataから注番をキーに検索する
+#         Tyuban01 = new_data['注番']
+#         conn = sqlite3.connect(db_name)
+#         Tyuban01_sql = conn.execute('select * from t_受注Data where 注番=?',
+#                                     [Tyuban01, ]).fetchall()
+#         conn.commit()
+#
+#         # sd1_受注数,sd1_納入計,sd1_注残を検索する
+#         sd1_受注数 = Tyuban01_sql[0][3]
+#         sd1_納入計 = Tyuban01_sql[0][4]
+#         sd1_注残 = Tyuban01_sql[0][7]
+#
+#         # New_納入計を生産する
+#         New_納入計 = int(sd1_納入計) + int(new_data['出荷数'])
+#         st.success(f'データがが追加されました。')
+#
+#         # new_data['品番'], new_data['注番']をキーに納入数を書き換える
+#         update01_sql = 'update t_受注Data set 納入数 = ? where 品番 = ? AND 注番 =?'
+#         conn.execute(update01_sql, [New_納入計, new_data['品番'], new_data['注番']])
+#         conn.commit()
+#
+#         # new_data['品番'], new_data['注番']をキーに納入日を書き換える
+#         update01_sq2 = 'update t_受注Data set 納入日 = ? where 品番 = ? AND 注番 =?'
+#         conn.execute(update01_sq2, [new_data['出荷日'], new_data['品番'], new_data['注番']])
+#         conn.commit()
+#
+#         # New_注残を算出する
+#         New_注残0 = int(sd1_受注数) - int(New_納入計)
+#
+#         # New_注残が[完納]か[注残]のメッセージのコメントを記入する
+#         if sd1_受注数 == New_納入計:
+#             New_注残 = f'{New_注残0} [[完納]]'
+#         else:
+#             New_注残 = f'{New_注残0} [注残]'
+#
+#         # 出荷入力時に、在庫Dataの在庫数から、出荷数を差し引く。
+#         Hindan01 = dd_品番
+#         conn = sqlite3.connect(db_name)
+#         Tyuban01_sql_sql = conn.execute('select * from t_在庫Data where 品番=?',
+#                                         [Hindan01, ]).fetchall()
+#         conn.commit()
+#
+#         # sd1_受注数,sd1_納入計,sd1_注残を検索する
+#         dd_在庫数 = Tyuban01_sql_sql[0][3]
+#         New在庫数 = int(dd_在庫数) - int(dd_出荷数)
+#         st.success(New在庫数)
+#         st.success(new_data['品番'])
+#
+#         # New在庫数のsqlを実施する[t_在庫Data]
+#         update01_sq1 = 'update t_在庫Data set 在庫数 = ? where 品番 = ?'
+#         conn.execute(update01_sq1, [f'{New在庫数}', new_data['品番'], ])
+#         conn.commit()
+#
+#         # New_注残の_sqlを実施する[t_受注Data]
+#         update02_sq2 = 'update t_受注Data set 注残 = ? where 品番 = ? AND 注番 =?'
+#         conn.execute(update02_sq2, [f'{New_注残}', new_data['品番'], new_data['注番']])
+#         conn.commit()
+#
+#     # データを表示する
+#     st.write(df)
+#     st.success(new_data['注番'])
+#
+#     # DBをクローズする
+#     cur.close()
+#     conn.close()
+#
+#
 # ////////// 出荷編集[出荷2編集2] //////////
 def changes22():
     st.title('出荷2編集2')
     st.subheader('出荷2編集2は項目で編集します。')
-
-    image = Image.open('./data/牛.png')
-    st.image(image, width=70)
-
-    # テーブルからデータを読み込む
-    conn = sqlite3.connect(db_name)
-    c = conn.cursor()
-    df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
-
-    # 編集する行を選択する
-    row_index = st.number_input('編集する行のindex(薄い数字)を入力してください。', min_value=0, max_value=len(df) - 1,
-                                value=0)
-
-    # 編集する項目を選択する
-    columns = ['番号', '品番', '出荷数', '注番', '出荷日', '出荷金額']
-    selected_column = st.selectbox('編集する項目を選択してください。', columns)
-
-    # 編集する値を入力する
-    new_value = st.text_input('新しい値を入力してください。', value=str(df.loc[row_index, selected_column]))
-
-    # 編集ボタンを押したら、DBを更新する
-    if st.button('編集'):
-        c.execute(
-            f"UPDATE t_出荷Data SET {selected_column}='{new_value}' WHERE 番号={df.loc[row_index, '番号']}")
-        conn.commit()
-        st.success('データが更新されました。')
-
-    # データフレームを表示
-    st.write(df)
-
-    # DBをクローズする
-    conn.close()
-
-
+#
+#     image = Image.open('./data/牛.png')
+#     st.image(image, width=70)
+#
+#     # テーブルからデータを読み込む
+#     conn = sqlite3.connect(db_name)
+#     c = conn.cursor()
+#     df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
+#
+#     # 編集する行を選択する
+#     row_index = st.number_input('編集する行のindex(薄い数字)を入力してください。', min_value=0, max_value=len(df) - 1,
+#                                 value=0)
+#
+#     # 編集する項目を選択する
+#     columns = ['番号', '品番', '出荷数', '注番', '出荷日', '出荷金額']
+#     selected_column = st.selectbox('編集する項目を選択してください。', columns)
+#
+#     # 編集する値を入力する
+#     new_value = st.text_input('新しい値を入力してください。', value=str(df.loc[row_index, selected_column]))
+#
+#     # 編集ボタンを押したら、DBを更新する
+#     if st.button('編集'):
+#         c.execute(
+#             f"UPDATE t_出荷Data SET {selected_column}='{new_value}' WHERE 番号={df.loc[row_index, '番号']}")
+#         conn.commit()
+#         st.success('データが更新されました。')
+#
+#     # データフレームを表示
+#     st.write(df)
+#
+#     # DBをクローズする
+#     conn.close()
+#
+#
 # ////////// 出荷削除[出荷2削除3] //////////
 def deletes23():
     # title表示する
     st.title('出荷2削除3')
     st.subheader('出荷1削除3は[index(薄い数字)]で削除します。')
-
-    # Image画像の指定
-    image = Image.open('./data/牛.png')
-    st.image(image, width=70)
-
-    # SQLite3 DBに接続する
-    conn = sqlite3.connect(db_name)
-    df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
-
-    # 編集する行を選択する
-    row_index = st.number_input('編集する行のindex(薄い数字)を入力してください。', min_value=0, max_value=len(df) - 1,
-                                value=0)
-    # データフレームを表示
-    st.write(df)
-
-    # SQLite3 DBに接続する
-    conn = sqlite3.connect(db_name)
-    df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
-
-    if st.button('削除'):
-        # SQLite3 DBに接続する
-        conn = sqlite3.connect(db_name)
-        cur = conn.cursor()
-
-        dd_番号 = row_index
-        cur.execute('DELETE FROM t_出荷Data WHERE 番号 = ?', [dd_番号])
-        conn.commit()
-        st.success(f'{dd_番号}データが削除されました。')
-
-        # 削除後のデータを取得
-        cur.execute('SELECT * FROM t_出荷Data')
-        df = pd.DataFrame(cur.fetchall(),
-                          columns=['番号', '品番', '納入数', '注番', '納入日', '納入金額'])
-        # 番号,品番,納入数,注番,納入日,納入金額
-        conn.close()
-
-        # データフレームを表示
-        st.write(df)
-
-
+#
+#     # Image画像の指定
+#     image = Image.open('./data/牛.png')
+#     st.image(image, width=70)
+#
+#     # SQLite3 DBに接続する
+#     conn = sqlite3.connect(db_name)
+#     df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
+#
+#     # 編集する行を選択する
+#     row_index = st.number_input('編集する行のindex(薄い数字)を入力してください。', min_value=0, max_value=len(df) - 1,
+#                                 value=0)
+#     # データフレームを表示
+#     st.write(df)
+#
+#     # SQLite3 DBに接続する
+#     conn = sqlite3.connect(db_name)
+#     df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
+#
+#     if st.button('削除'):
+#         # SQLite3 DBに接続する
+#         conn = sqlite3.connect(db_name)
+#         cur = conn.cursor()
+#
+#         dd_番号 = row_index
+#         cur.execute('DELETE FROM t_出荷Data WHERE 番号 = ?', [dd_番号])
+#         conn.commit()
+#         st.success(f'{dd_番号}データが削除されました。')
+#
+#         # 削除後のデータを取得
+#         cur.execute('SELECT * FROM t_出荷Data')
+#         df = pd.DataFrame(cur.fetchall(),
+#                           columns=['番号', '品番', '納入数', '注番', '納入日', '納入金額'])
+#         # 番号,品番,納入数,注番,納入日,納入金額
+#         conn.close()
+#
+#         # データフレームを表示
+#         st.write(df)
+#
+#
 # ////////// 出荷追加[出荷Dataの金額表示] //////////
 def showamount24():
     # title表示する
     st.title('出荷2金額表示表示4')
     st.subheader('出荷Dataの金額表示します。')
-
-    image = Image.open('./data/牛.png')
-    st.image(image, width=70)
-
-    conn = sqlite3.connect(db_name)
-    df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
-
-    # 注番を入力する
-    search_term = st.text_input('注番を入力してください')
-
-    # 注番でフィルタリングする
-    if search_term:
-        query = f"SELECT * FROM t_出荷Data WHERE 注番 LIKE '%{search_term}%'"
-        df = pd.read_sql_query(query, conn)
-
-    # データフレームを表示
-    st.write(df)
-
-
+#
+#     image = Image.open('./data/牛.png')
+#     st.image(image, width=70)
+#
+#     conn = sqlite3.connect(db_name)
+#     df = pd.read_sql('SELECT * FROM t_出荷Data', conn)
+#
+#     # 注番を入力する
+#     search_term = st.text_input('注番を入力してください')
+#
+#     # 注番でフィルタリングする
+#     if search_term:
+#         query = f"SELECT * FROM t_出荷Data WHERE 注番 LIKE '%{search_term}%'"
+#         df = pd.read_sql_query(query, conn)
+#
+#     # データフレームを表示
+#     st.write(df)
+#
+#
 # ////////// 在庫検索[在庫3検索0] //////////
 def finding30():
     # title表示する
     st.title('在庫3検索0')
     st.subheader('在庫3検索0は品番で表示します。')
-
-    image = Image.open('./data/犬.png')
-    st.image(image, width=70)
-
-    # SQLite DBを読み込む
-    conn = sqlite3.connect(db_name)
-    c = conn.cursor()
-
-    # 品番を入力する
-    search_term = st.text_input('品番を入力してください')
-
-    # 品番でフィルタリングする
-    if search_term:
-        query = f"SELECT * FROM t_在庫Data WHERE 品番 LIKE '%{search_term}%'"
-    else:
-        query = "SELECT * FROM t_在庫Data"
-    df = pd.read_sql(query, conn)
-    conn.close()
-
-    # データフレームを表示
-    st.write(df)
-
-
+#
+#     image = Image.open('./data/犬.png')
+#     st.image(image, width=70)
+#
+#     # SQLite DBを読み込む
+#     conn = sqlite3.connect(db_name)
+#     c = conn.cursor()
+#
+#     # 品番を入力する
+#     search_term = st.text_input('品番を入力してください')
+#
+#     # 品番でフィルタリングする
+#     if search_term:
+#         query = f"SELECT * FROM t_在庫Data WHERE 品番 LIKE '%{search_term}%'"
+#     else:
+#         query = "SELECT * FROM t_在庫Data"
+#     df = pd.read_sql(query, conn)
+#     conn.close()
+#
+#     # データフレームを表示
+#     st.write(df)
+#
+#
 def adding31():
     # title表示する
     st.title('在庫3追加1')
     st.subheader('在庫3追加1は品番で追加します。')
-
-    image = Image.open('./data/犬.png')
-    st.image(image, width=70)
-
-    # SQLite3 DBに接続する
-    conn = sqlite3.connect(db_name)
-    cur = conn.cursor()
-
-    # 品番を入力する
-    search_term = st.text_input('品番を入力してください')
-    dd_品番 = search_term
-    tanka3_sql = conn.execute('select * from t_在庫Data where 品番=?', [dd_品番, ]).fetchall()
-
-    if not tanka3_sql:
-        st.write('在庫追加を続けて下さい＞')
-        new_data = {}
-    else:
-        st.write('品番が重複しています。確認してください。')
-
-    # 品番でフィルタリングする
-    if search_term:
-        query = f"SELECT * FROM t_在庫Data WHERE 品番 LIKE '%{search_term}%'"
-        df = pd.read_sql_query(query, conn)
-    else:
-        query = "SELECT * FROM t_在庫Data"
-        df = pd.read_sql_query(query, conn)
-
-    # 最後の番号を取得する
-    cur.execute("SELECT MAX(番号) FROM t_在庫Data")
-    last_row = cur.fetchone()[0]
-    last_row = last_row if last_row is not None else 0
-
-    # 追加フォームを作成する
-    new_data = {}
-    col1, col2, col3 = st.columns(3)
-    new_data['番号'] = col1.text_input('番号', value=last_row + 1)
-    new_data['品番'] = col1.text_input('品番', value=search_term)
-    new_data['名称'] = col1.text_input('名称')
-    new_data['在庫数'] = col1.text_input('在庫数')
-    new_data['作成日'] = col1.text_input('作成日')
-    new_data['単価'] = col1.text_input('単価')
-    new_data['在庫日'] = col2.text_input('在庫日')
-
-    # 追加ボタンを押したら、DBに書き込む
-    if st.button('追加'):
-        values = [new_data['番号'], new_data['品番'], new_data['名称'], new_data['在庫数'],
-                  new_data['作成日'],
-                  new_data['単価'], new_data['在庫日']]
-        cur.execute("INSERT INTO t_在庫Data VALUES (?, ?, ?, ?, ?, ?, ?)", values)
-        conn.commit()
-
-        st.success('データが追加されました。')
-
-    # データを表示する
-    st.write(df)
-
-    # DBをクローズする
-    cur.close()
-    conn.close()
-
-
+#
+#     image = Image.open('./data/犬.png')
+#     st.image(image, width=70)
+#
+#     # SQLite3 DBに接続する
+#     conn = sqlite3.connect(db_name)
+#     cur = conn.cursor()
+#
+#     # 品番を入力する
+#     search_term = st.text_input('品番を入力してください')
+#     dd_品番 = search_term
+#     tanka3_sql = conn.execute('select * from t_在庫Data where 品番=?', [dd_品番, ]).fetchall()
+#
+#     if not tanka3_sql:
+#         st.write('在庫追加を続けて下さい＞')
+#         new_data = {}
+#     else:
+#         st.write('品番が重複しています。確認してください。')
+#
+#     # 品番でフィルタリングする
+#     if search_term:
+#         query = f"SELECT * FROM t_在庫Data WHERE 品番 LIKE '%{search_term}%'"
+#         df = pd.read_sql_query(query, conn)
+#     else:
+#         query = "SELECT * FROM t_在庫Data"
+#         df = pd.read_sql_query(query, conn)
+#
+#     # 最後の番号を取得する
+#     cur.execute("SELECT MAX(番号) FROM t_在庫Data")
+#     last_row = cur.fetchone()[0]
+#     last_row = last_row if last_row is not None else 0
+#
+#     # 追加フォームを作成する
+#     new_data = {}
+#     col1, col2, col3 = st.columns(3)
+#     new_data['番号'] = col1.text_input('番号', value=last_row + 1)
+#     new_data['品番'] = col1.text_input('品番', value=search_term)
+#     new_data['名称'] = col1.text_input('名称')
+#     new_data['在庫数'] = col1.text_input('在庫数')
+#     new_data['作成日'] = col1.text_input('作成日')
+#     new_data['単価'] = col1.text_input('単価')
+#     new_data['在庫日'] = col2.text_input('在庫日')
+#
+#     # 追加ボタンを押したら、DBに書き込む
+#     if st.button('追加'):
+#         values = [new_data['番号'], new_data['品番'], new_data['名称'], new_data['在庫数'],
+#                   new_data['作成日'],
+#                   new_data['単価'], new_data['在庫日']]
+#         cur.execute("INSERT INTO t_在庫Data VALUES (?, ?, ?, ?, ?, ?, ?)", values)
+#         conn.commit()
+#
+#         st.success('データが追加されました。')
+#
+#     # データを表示する
+#     st.write(df)
+#
+#     # DBをクローズする
+#     cur.close()
+#     conn.close()
+#
+#
 # ////////// 在庫編集[在庫3編集2] //////////
 def changes32():
     # title表示する
     st.title('在庫3編集2')
     st.subheader('在庫3編集2は項目で編集します。')
-
-    image = Image.open('./data/犬.png')
-    st.image(image, width=70)
-
-    # テーブルからデータを読み込む
-    conn = sqlite3.connect(db_name)
-    c = conn.cursor()
-    df = pd.read_sql('SELECT * FROM t_在庫Data', conn)
-
-    # 編集する行を選択する
-    row_index = st.number_input('編集する行のindex(薄い数字)を入力してください。', min_value=0, max_value=len(df) - 1,
-                                value=0)
-
-    # 編集する項目を選択する
-    columns = ['番号', '品番', '名称', '在庫数', '作成日', '単価', '在庫日']
-    selected_column = st.selectbox('編集する項目を選択してください。', columns)
-
-    # 編集する値を入力する
-    new_value = st.text_input('新しい値を入力してください。', value=str(df.loc[row_index, selected_column]))
-
-    # 編集ボタンを押したら、DBを更新する
-    if st.button('編集'):
-        c.execute(
-            f"UPDATE t_在庫Data SET {selected_column}='{new_value}' WHERE 番号={df.loc[row_index, '番号']}")
-        conn.commit()
-        st.success('データが削除されました。')
-
-    # データフレームを表示
-    st.write(df)
-
-    # DBをクローズする
-    conn.close()
-
-
+#
+#     image = Image.open('./data/犬.png')
+#     st.image(image, width=70)
+#
+#     # テーブルからデータを読み込む
+#     conn = sqlite3.connect(db_name)
+#     c = conn.cursor()
+#     df = pd.read_sql('SELECT * FROM t_在庫Data', conn)
+#
+#     # 編集する行を選択する
+#     row_index = st.number_input('編集する行のindex(薄い数字)を入力してください。', min_value=0, max_value=len(df) - 1,
+#                                 value=0)
+#
+#     # 編集する項目を選択する
+#     columns = ['番号', '品番', '名称', '在庫数', '作成日', '単価', '在庫日']
+#     selected_column = st.selectbox('編集する項目を選択してください。', columns)
+#
+#     # 編集する値を入力する
+#     new_value = st.text_input('新しい値を入力してください。', value=str(df.loc[row_index, selected_column]))
+#
+#     # 編集ボタンを押したら、DBを更新する
+#     if st.button('編集'):
+#         c.execute(
+#             f"UPDATE t_在庫Data SET {selected_column}='{new_value}' WHERE 番号={df.loc[row_index, '番号']}")
+#         conn.commit()
+#         st.success('データが削除されました。')
+#
+#     # データフレームを表示
+#     st.write(df)
+#
+#     # DBをクローズする
+#     conn.close()
+#
+#
 # ////////// 在庫編集[在庫3削除3] //////////
 def delete33():
     # title表示する
     st.title('在庫3編集3')
     st.subheader('在庫3削除3は[注番]で削除します。')
-
-    # Image画像の指定
-    image = Image.open('./data/犬.png')
-    st.image(image, width=70)
-
-    # SQLite3 DBに接続する
-    conn = sqlite3.connect(db_name)
-    cur = conn.cursor()
-
-    # 品番を選択して削除する
-    st.subheader('在庫データを削除します。')
-
-    # 品番を入力する
-    search_term = st.text_input('品番を入力してください')
-
-    # 品番でフィルタリングする
-    if search_term:
-        query = f"SELECT * FROM t_在庫Data WHERE 品番 LIKE '%{search_term}%'"
-    else:
-        query = "SELECT * FROM t_在庫Data"
-    df = pd.read_sql(query, conn)
-    conn.close()
-
-    # データフレームを表示
-    st.write(df)
-
-    if st.button('削除'):
-        # SQLite3 DBに接続する
-        conn = sqlite3.connect(db_name)
-        cur = conn.cursor()
-
-        dd_品番 = search_term
-        delete_sql = conn.execute('delete from t_在庫Data where 品番 =?',
-                                  [dd_品番, ]).fetchall()
-        conn.commit()
-        st.success(f'{dd_品番}データが削除されました。')
-
-        # データフレームを表示
-        st.write(df)
-
-
+#
+#     # Image画像の指定
+#     image = Image.open('./data/犬.png')
+#     st.image(image, width=70)
+#
+#     # SQLite3 DBに接続する
+#     conn = sqlite3.connect(db_name)
+#     cur = conn.cursor()
+#
+#     # 品番を選択して削除する
+#     st.subheader('在庫データを削除します。')
+#
+#     # 品番を入力する
+#     search_term = st.text_input('品番を入力してください')
+#
+#     # 品番でフィルタリングする
+#     if search_term:
+#         query = f"SELECT * FROM t_在庫Data WHERE 品番 LIKE '%{search_term}%'"
+#     else:
+#         query = "SELECT * FROM t_在庫Data"
+#     df = pd.read_sql(query, conn)
+#     conn.close()
+#
+#     # データフレームを表示
+#     st.write(df)
+#
+#     if st.button('削除'):
+#         # SQLite3 DBに接続する
+#         conn = sqlite3.connect(db_name)
+#         cur = conn.cursor()
+#
+#         dd_品番 = search_term
+#         delete_sql = conn.execute('delete from t_在庫Data where 品番 =?',
+#                                   [dd_品番, ]).fetchall()
+#         conn.commit()
+#         st.success(f'{dd_品番}データが削除されました。')
+#
+#         # データフレームを表示
+#         st.write(df)
+#
+#
 # ////////// 受注出荷[受注4削除3] //////////
 def findings40():
     # title表示する
     st.title('受注出荷')
     st.subheader('受注出荷Dataは品番で検索し、注番で絞り込みます。')
-
-    image = Image.open('./data/猪.png')
-    st.image(image, width=70)
-
-    conn = sqlite3.connect(db_name)
-
-    # 品番を入力する
-    search_term = st.text_input('品番を入力してください')
-
-    # 品番でフィルタリングする
-    if search_term:
-        df1 = pd.read_sql(f"SELECT * FROM t_受注Data WHERE 品番 LIKE '%{search_term}%'", conn)
-        df2 = pd.read_sql(f"SELECT * FROM t_出荷Data WHERE 品番 LIKE '%{search_term}%'", conn)
-    else:
-        df1 = pd.read_sql("SELECT * FROM t_受注Data", conn)
-        df2 = pd.read_sql("SELECT * FROM t_出荷Data", conn)
-
-    # 注番を入力する
-    search_term2 = st.text_input('注番を入力してください')
-
-    # 注番でフィルタリングする
-    if search_term2:
-        df1 = df1[df1['注番'].str.contains(search_term2)]
-        df2 = df2[df2['注番'].str.contains(search_term2)]
-
-    # 二つのカラムを用意する
-    col1, col2 = st.columns(2)
-
-    # 左側のカラムにテーブル1を表示
-    with col1:
-        st.write(df1)
-
-    # 右側のカラムにテーブル2を表示
-    with col2:
-        st.write(df2)
-
-    st.write('全画面データを表示します。')
-    st.write(df1)
-    st.write(df2)
-
-    conn.close()
-
-
+#
+#     image = Image.open('./data/猪.png')
+#     st.image(image, width=70)
+#
+#     conn = sqlite3.connect(db_name)
+#
+#     # 品番を入力する
+#     search_term = st.text_input('品番を入力してください')
+#
+#     # 品番でフィルタリングする
+#     if search_term:
+#         df1 = pd.read_sql(f"SELECT * FROM t_受注Data WHERE 品番 LIKE '%{search_term}%'", conn)
+#         df2 = pd.read_sql(f"SELECT * FROM t_出荷Data WHERE 品番 LIKE '%{search_term}%'", conn)
+#     else:
+#         df1 = pd.read_sql("SELECT * FROM t_受注Data", conn)
+#         df2 = pd.read_sql("SELECT * FROM t_出荷Data", conn)
+#
+#     # 注番を入力する
+#     search_term2 = st.text_input('注番を入力してください')
+#
+#     # 注番でフィルタリングする
+#     if search_term2:
+#         df1 = df1[df1['注番'].str.contains(search_term2)]
+#         df2 = df2[df2['注番'].str.contains(search_term2)]
+#
+#     # 二つのカラムを用意する
+#     col1, col2 = st.columns(2)
+#
+#     # 左側のカラムにテーブル1を表示
+#     with col1:
+#         st.write(df1)
+#
+#     # 右側のカラムにテーブル2を表示
+#     with col2:
+#         st.write(df2)
+#
+#     st.write('全画面データを表示します。')
+#     st.write(df1)
+#     st.write(df2)
+#
+#     conn.close()
+#
+#
 # ////////// 出荷[注文4追加1_日付] //////////
 def addings41():
     # title表示する
     st.title('受注出荷')
     st.subheader('出荷Dataは出荷日で検索し絞り込みます。')
-
-    image = Image.open('./data/猪.png')
-    st.image(image, width=70)
-
-    conn = sqlite3.connect(db_name)
-
-    # 品番を入力する
-    search_term = st.text_input('出荷日を入力してください')
-
-    # 品番でフィルタリングする
-    if search_term:
-        query = f"SELECT * FROM t_出荷Data WHERE 出荷日 LIKE '%{search_term}%'"
-    else:
-        query = "SELECT * FROM t_出荷Data"
-    df = pd.read_sql(query, conn)
-    conn.close()
-
-    st.write(df)
-
-
+#
+#     image = Image.open('./data/猪.png')
+#     st.image(image, width=70)
+#
+#     conn = sqlite3.connect(db_name)
+#
+#     # 品番を入力する
+#     search_term = st.text_input('出荷日を入力してください')
+#
+#     # 品番でフィルタリングする
+#     if search_term:
+#         query = f"SELECT * FROM t_出荷Data WHERE 出荷日 LIKE '%{search_term}%'"
+#     else:
+#         query = "SELECT * FROM t_出荷Data"
+#     df = pd.read_sql(query, conn)
+#     conn.close()
+#
+#     st.write(df)
+#
+#
 def show_data42():
     # title表示する
     st.title('カレンダー選択表示42')
     st.subheader('期間別に、カレンダーでデータを抽出します。')
-
-    image = Image.open('./data/猪.png')
-    st.image(image, width=70)
-
-    # SQLite3に接続
-    conn = sqlite3.connect(db_name)
-    cursor = conn.cursor()
-
-    # ユーザーからの入力を受け取る
-    start_date = st.date_input("開始日を選択してください")
-    end_date = st.date_input("終了日を選択してください")
-
-    # クエリを実行
-    if st.button('実行'):
-        # クエリを実行
-        if start_date and end_date:
-            # クエリを作成
-
-            query = f"SELECT * FROM t_受注Data WHERE 納期 BETWEEN '{start_date.strftime('%Y/%m/%d')}" \
-                    f"' AND '{end_date.strftime('%Y/%m/%d')}'"
-
-            # SQLite3にクエリを実行して、データフレームに変換
-            df = pd.read_sql(query, conn)
-
-            # 結果を表示
-            if df.empty:
-                st.warning("該当するデータがありません。")
-            else:
-                st.warning(f'{start_date}から{end_date}までの受注Dataを表示します。')
-                st.write(df)
-
-        # 接続を閉じる
-        cursor.close()
-        conn.close()
+#
+#     image = Image.open('./data/猪.png')
+#     st.image(image, width=70)
+#
+#     # SQLite3に接続
+#     conn = sqlite3.connect(db_name)
+#     cursor = conn.cursor()
+#
+#     # ユーザーからの入力を受け取る
+#     start_date = st.date_input("開始日を選択してください")
+#     end_date = st.date_input("終了日を選択してください")
+#
+#     # クエリを実行
+#     if st.button('実行'):
+#         # クエリを実行
+#         if start_date and end_date:
+#             # クエリを作成
+#
+#             query = f"SELECT * FROM t_受注Data WHERE 納期 BETWEEN '{start_date.strftime('%Y/%m/%d')}" \
+#                     f"' AND '{end_date.strftime('%Y/%m/%d')}'"
+#
+#             # SQLite3にクエリを実行して、データフレームに変換
+#             df = pd.read_sql(query, conn)
+#
+#             # 結果を表示
+#             if df.empty:
+#                 st.warning("該当するデータがありません。")
+#             else:
+#                 st.warning(f'{start_date}から{end_date}までの受注Dataを表示します。')
+#                 st.write(df)
+#
+#         # 接続を閉じる
+#         cursor.close()
+#         conn.close()
 
 
 def show_invoice43():
