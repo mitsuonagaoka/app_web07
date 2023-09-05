@@ -1,14 +1,7 @@
 sqlite3
 pandas==2.1.0
+qrcode
 streamlit==2.26.0
 Pillow==10.0.0
-datetime==5.2
-dateutil
 reportlab==4.0.4
-contextlib
-plotly==5.16.1
-base64
-qrcode
-pdf2image==1.16.3
-pytesseract==0.3.10
-os
+
